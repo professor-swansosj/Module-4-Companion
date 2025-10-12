@@ -1,0 +1,40 @@
+# War Card Game - Python Requirements
+# ===================================
+# Module 4: Python Requests Library Lab Project
+# FSCJ - Software Defined Networking Course
+
+# Core HTTP library for API requests
+requests>=2.31.0
+
+# Optional: Enhanced JSON handling (already included in Python)
+# json is built-in, no separate package needed
+
+# Optional: Better error handling and debugging
+# urllib3>=2.0.0  # Automatically installed with requests
+
+# Development/Testing Dependencies (optional)
+# pytest>=7.4.0       # For unit testing
+# responses>=0.23.0    # For mocking HTTP requests in tests
+
+# Note for Students:
+# =================
+# This project only requires the 'requests' library as an external dependency.
+# All other functionality uses Python's built-in libraries:
+# - json (for JSON parsing)
+# - datetime (for timestamps)
+# - typing (for type hints)
+# - sys, os (for system operations)
+# 
+# To install requirements:
+#   pip install -r requirements.txt
+#
+# Or install individually:
+#   pip install requests
+#
+# Virtual Environment (Recommended):
+#   python -m venv war_game_env
+#   # Windows:
+#   war_game_env\Scripts\activate
+#   # Linux/Mac:
+#   source war_game_env/bin/activate
+#   pip install -r requirements.txt

@@ -1,0 +1,206 @@
+{
+  "network_devices": [
+    {
+      "device_id": "RTR-001",
+      "hostname": "corp-router-01.company.com",
+      "type": "router",
+      "vendor": "Cisco",
+      "model": "ISR4451",
+      "serial_number": "FTX1942A1B2",
+      "management_ip": "10.1.1.1",
+      "location": {
+        "building": "Datacenter A",
+        "rack": "R01",
+        "unit": 1
+      },
+      "status": "online",
+      "last_seen": "2024-10-12T10:30:00Z",
+      "interfaces": [
+        {
+          "name": "GigabitEthernet0/0/0",
+          "type": "physical",
+          "ip_address": "192.168.1.1",
+          "subnet_mask": "255.255.255.0",
+          "status": "up",
+          "description": "LAN Connection",
+          "speed": "1000",
+          "duplex": "full"
+        },
+        {
+          "name": "GigabitEthernet0/0/1",
+          "type": "physical", 
+          "ip_address": "10.10.1.1",
+          "subnet_mask": "255.255.255.0",
+          "status": "down",
+          "description": "WAN Connection",
+          "speed": "1000",
+          "duplex": "full"
+        }
+      ],
+      "routing": {
+        "protocols": ["OSPF", "BGP"],
+        "ospf": {
+          "process_id": 1,
+          "router_id": "1.1.1.1",
+          "areas": ["0.0.0.0"]
+        },
+        "static_routes": [
+          {
+            "network": "0.0.0.0",
+            "netmask": "0.0.0.0", 
+            "gateway": "10.10.1.254",
+            "description": "Default Route"
+          }
+        ]
+      },
+      "snmp": {
+        "enabled": true,
+        "community": "public",
+        "version": "2c",
+        "location": "Datacenter A Rack 1",
+        "contact": "network-admin@company.com"
+      }
+    },
+    {
+      "device_id": "SW-001",
+      "hostname": "corp-switch-01.company.com",
+      "type": "switch",
+      "vendor": "Cisco",
+      "model": "Catalyst 3850",
+      "serial_number": "FCW2139L0GH",
+      "management_ip": "10.1.1.10",
+      "location": {
+        "building": "Datacenter A",
+        "rack": "R01", 
+        "unit": 2
+      },
+      "status": "online",
+      "last_seen": "2024-10-12T10:29:45Z",
+      "interfaces": [
+        {
+          "name": "FastEthernet0/1",
+          "type": "access",
+          "vlan": 100,
+          "status": "up",
+          "description": "Server Connection",
+          "speed": "100",
+          "duplex": "full"
+        },
+        {
+          "name": "FastEthernet0/2",
+          "type": "access",
+          "vlan": 200,
+          "status": "up",
+          "description": "Workstation Connection", 
+          "speed": "100",
+          "duplex": "full"
+        },
+        {
+          "name": "GigabitEthernet0/1",
+          "type": "trunk",
+          "vlans": [100, 200, 300],
+          "status": "up",
+          "description": "Uplink to Router",
+          "speed": "1000",
+          "duplex": "full"
+        }
+      ],
+      "vlans": [
+        {
+          "id": 100,
+          "name": "Management",
+          "description": "Management VLAN",
+          "ports": ["Fa0/1", "Fa0/5", "Fa0/6"]
+        },
+        {
+          "id": 200,
+          "name": "Users",
+          "description": "User Workstations",
+          "ports": ["Fa0/2", "Fa0/3", "Fa0/4"]
+        },
+        {
+          "id": 300,
+          "name": "Servers",
+          "description": "Server VLAN", 
+          "ports": ["Fa0/7", "Fa0/8"]
+        }
+      ],
+      "spanning_tree": {
+        "mode": "pvst+",
+        "root_bridge": false,
+        "priority": 32768
+      }
+    },
+    {
+      "device_id": "FW-001", 
+      "hostname": "corp-firewall-01.company.com",
+      "type": "firewall",
+      "vendor": "Fortinet",
+      "model": "FortiGate 100F",
+      "serial_number": "FG100F3G19123456",
+      "management_ip": "10.1.1.100",
+      "location": {
+        "building": "Datacenter A",
+        "rack": "R02",
+        "unit": 1
+      },
+      "status": "online",
+      "last_seen": "2024-10-12T10:28:15Z",
+      "interfaces": [
+        {
+          "name": "port1",
+          "type": "wan",
+          "ip_address": "203.0.113.10",
+          "subnet_mask": "255.255.255.252",
+          "status": "up",
+          "description": "Internet Connection",
+          "zone": "WAN"
+        },
+        {
+          "name": "port2",
+          "type": "lan",
+          "ip_address": "192.168.1.254",
+          "subnet_mask": "255.255.255.0", 
+          "status": "up",
+          "description": "Internal LAN",
+          "zone": "LAN"
+        }
+      ],
+      "security_policies": [
+        {
+          "id": 1,
+          "name": "LAN_to_WAN",
+          "source": "LAN",
+          "destination": "WAN", 
+          "action": "permit",
+          "services": ["HTTP", "HTTPS", "DNS"]
+        },
+        {
+          "id": 2,
+          "name": "WAN_to_DMZ",
+          "source": "WAN",
+          "destination": "DMZ",
+          "action": "permit",
+          "services": ["HTTP", "HTTPS"]
+        }
+      ]
+    }
+  ],
+  "network_summary": {
+    "total_devices": 3,
+    "device_types": {
+      "router": 1,
+      "switch": 1,
+      "firewall": 1
+    },
+    "status_summary": {
+      "online": 3,
+      "offline": 0,
+      "maintenance": 0
+    },
+    "locations": {
+      "Datacenter A": 3
+    },
+    "last_updated": "2024-10-12T10:30:00Z"
+  }
+}

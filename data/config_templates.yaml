@@ -1,0 +1,271 @@
+# Network Configuration Templates
+# YAML format for Infrastructure as Code
+
+global_settings:
+  organization: "FSCJ Computer Science"
+  domain: "fscj.edu"
+  dns_servers:
+    - "8.8.8.8"
+    - "1.1.1.1"
+  ntp_servers:
+    - "pool.ntp.org"
+    - "time.nist.gov"
+
+network_templates:
+  
+  # Router Configuration Template
+  router_template:
+    hostname_pattern: "rtr-{site}-{number:02d}"
+    management_network: "10.0.0.0/24"
+    loopback_network: "1.1.1.0/24"
+    
+    interfaces:
+      - name: "GigabitEthernet0/0/0"
+        type: "wan"
+        description: "WAN Connection"
+        dhcp_client: true
+        
+      - name: "GigabitEthernet0/0/1"
+        type: "lan"
+        description: "LAN Connection"
+        ip_address: "192.168.1.1"
+        subnet_mask: "255.255.255.0"
+        
+    routing:
+      ospf:
+        process_id: 1
+        area: "0.0.0.0"
+        networks:
+          - "192.168.1.0 0.0.0.255"
+          - "10.0.0.0 0.0.0.255"
+      
+      static_routes:
+        - destination: "0.0.0.0"
+          netmask: "0.0.0.0"
+          next_hop: "dhcp"
+          description: "Default route via ISP"
+    
+    services:
+      dhcp:
+        enabled: true
+        pools:
+          - name: "LAN_POOL"
+            network: "192.168.1.0"
+            netmask: "255.255.255.0"
+            range_start: "192.168.1.100"
+            range_end: "192.168.1.200"
+            gateway: "192.168.1.1"
+            dns_servers: ["192.168.1.1"]
+            lease_time: "24h"
+      
+      nat:
+        enabled: true
+        inside_interfaces: ["GigabitEthernet0/0/1"]
+        outside_interfaces: ["GigabitEthernet0/0/0"]
+
+  # Switch Configuration Template  
+  switch_template:
+    hostname_pattern: "sw-{site}-{number:02d}"
+    management_network: "10.0.0.0/24"
+    
+    vlans:
+      - id: 1
+        name: "default"
+        description: "Default VLAN"
+        
+      - id: 100
+        name: "management"
+        description: "Management VLAN"
+        ip_helper: "192.168.1.1"
+        
+      - id: 200
+        name: "users"
+        description: "User Workstations"
+        ip_helper: "192.168.1.1"
+        
+      - id: 300
+        name: "servers"
+        description: "Server Network"
+        ip_helper: "192.168.1.1"
+        
+      - id: 999
+        name: "quarantine"
+        description: "Security Quarantine"
+    
+    interface_templates:
+      access_port:
+        type: "access"
+        vlan: 200  # Default to users VLAN
+        spanning_tree: "portfast"
+        storm_control: true
+        
+      trunk_port:
+        type: "trunk"
+        allowed_vlans: [100, 200, 300]
+        native_vlan: 1
+        
+      uplink_port:
+        type: "trunk"
+        allowed_vlans: "all"
+        native_vlan: 1
+        description: "Uplink to distribution layer"
+    
+    security:
+      port_security:
+        enabled: true
+        maximum_macs: 2
+        violation_action: "restrict"
+        
+      dhcp_snooping:
+        enabled: true
+        trusted_interfaces: ["GigabitEthernet0/1"]
+        
+      arp_inspection:
+        enabled: true
+        vlans: [200, 300]
+
+  # Firewall Configuration Template
+  firewall_template:
+    hostname_pattern: "fw-{site}-{number:02d}"
+    management_network: "10.0.0.0/24"
+    
+    zones:
+      - name: "WAN" 
+        description: "Internet/External"
+        security_level: 0
+        
+      - name: "LAN"
+        description: "Internal Network"
+        security_level: 100
+        
+      - name: "DMZ"
+        description: "Demilitarized Zone"
+        security_level: 50
+        
+      - name: "MGMT"
+        description: "Management Network"
+        security_level: 100
+
+    interfaces:
+      - name: "outside"
+        zone: "WAN"
+        type: "dhcp_client"
+        description: "Internet connection"
+        
+      - name: "inside"
+        zone: "LAN"
+        ip_address: "192.168.1.254"
+        netmask: "255.255.255.0"
+        description: "Internal network"
+        
+      - name: "dmz"
+        zone: "DMZ"
+        ip_address: "172.16.1.1"
+        netmask: "255.255.255.0"
+        description: "DMZ network"
+
+    access_lists:
+      - name: "INSIDE_TO_OUTSIDE"
+        rules:
+          - action: "permit"
+            protocol: "tcp"
+            source: "192.168.1.0/24"
+            destination: "any"
+            ports: [80, 443]
+            description: "Web traffic"
+            
+          - action: "permit"
+            protocol: "udp"
+            source: "192.168.1.0/24"
+            destination: "any"
+            ports: [53]
+            description: "DNS queries"
+            
+          - action: "deny"
+            protocol: "any"
+            source: "any"
+            destination: "any"
+            description: "Deny all other traffic"
+
+# Site-specific configurations
+sites:
+  headquarters:
+    location: "Jacksonville, FL"
+    network_prefix: "10.1.0.0/16"
+    router_count: 2
+    switch_count: 4
+    firewall_count: 1
+    
+    devices:
+      - hostname: "rtr-hq-01"
+        template: "router_template"
+        management_ip: "10.1.1.1"
+        
+      - hostname: "sw-hq-01"
+        template: "switch_template" 
+        management_ip: "10.1.1.10"
+        
+      - hostname: "fw-hq-01"
+        template: "firewall_template"
+        management_ip: "10.1.1.100"
+
+  branch_office:
+    location: "Orlando, FL"
+    network_prefix: "10.2.0.0/16"
+    router_count: 1
+    switch_count: 2
+    firewall_count: 1
+    
+    devices:
+      - hostname: "rtr-orl-01"
+        template: "router_template"
+        management_ip: "10.2.1.1"
+        
+      - hostname: "sw-orl-01"
+        template: "switch_template"
+        management_ip: "10.2.1.10"
+
+# Monitoring and Management
+monitoring:
+  snmp:
+    version: "2c"
+    read_community: "public"
+    write_community: "private"
+    
+  syslog:
+    servers:
+      - "10.1.1.50"
+      - "syslog.fscj.edu"
+    facility: "local0"
+    
+  ntp:
+    servers:
+      - "10.1.1.60"
+      - "pool.ntp.org"
+    timezone: "EST"
+
+# Security Policies
+security_policies:
+  password_policy:
+    minimum_length: 12
+    complexity: true
+    history: 5
+    max_age_days: 90
+    
+  access_control:
+    enable_aaa: true
+    authentication_method: "radius"
+    radius_servers:
+      - "10.1.1.70"
+    fallback_local: true
+    
+  logging:
+    level: "informational"
+    buffer_size: "64000"
+    console_logging: false
+    
+backup_configuration:
+  enabled: true
+  schedule: "daily"
+  retention_days: 30
+  location: "tftp://10.1.1.80/backups/"

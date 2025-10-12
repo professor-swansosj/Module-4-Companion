@@ -1,0 +1,60 @@
+{
+  "status": "success",
+  "timestamp": "2024-10-12T10:30:00Z",
+  "device_info": {
+    "hostname": "router-01.company.com",
+    "model": "Cisco ISR4451",
+    "version": "16.12.04",
+    "uptime": "45 days, 8 hours, 23 minutes",
+    "serial_number": "FTX1942A1B2"
+  },
+  "interfaces": [
+    {
+      "name": "GigabitEthernet0/0/0",
+      "status": "up",
+      "protocol": "up",
+      "ip_address": "192.168.1.1",
+      "netmask": "255.255.255.0",
+      "mtu": 1500,
+      "bandwidth": 1000000,
+      "statistics": {
+        "input_packets": 1504829,
+        "output_packets": 1398472,
+        "input_bytes": 234567890,
+        "output_bytes": 198765432,
+        "input_errors": 0,
+        "output_errors": 0,
+        "collisions": 0
+      }
+    },
+    {
+      "name": "GigabitEthernet0/0/1", 
+      "status": "down",
+      "protocol": "down",
+      "ip_address": null,
+      "netmask": null,
+      "mtu": 1500,
+      "bandwidth": 1000000,
+      "statistics": {
+        "input_packets": 0,
+        "output_packets": 0,
+        "input_bytes": 0,
+        "output_bytes": 0,
+        "input_errors": 5,
+        "output_errors": 0,
+        "collisions": 0
+      }
+    }
+  ],
+  "memory": {
+    "total": 4194304,
+    "used": 1425408,
+    "free": 2768896,
+    "usage_percent": 34
+  },
+  "cpu": {
+    "5sec_percent": 12,
+    "1min_percent": 15,
+    "5min_percent": 18
+  }
+}

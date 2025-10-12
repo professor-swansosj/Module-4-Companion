@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network_topology>
+  <metadata>
+    <created_by>FSCJ Network Team</created_by>
+    <created_date>2024-10-12</created_date>
+    <version>1.2</version>
+    <description>FSCJ Computer Science Department Network Topology</description>
+  </metadata>
+  
+  <sites>
+    <site id="HQ" name="Headquarters" location="Jacksonville, FL">
+      <address>
+        <street>501 W State St</street>
+        <city>Jacksonville</city>
+        <state>FL</state>
+        <zip>32202</zip>
+      </address>
+      
+      <network_segments>
+        <segment name="management" vlan="100">
+          <network>10.1.1.0/24</network>
+          <gateway>10.1.1.254</gateway>
+          <description>Management Network</description>
+        </segment>
+        
+        <segment name="users" vlan="200">
+          <network>10.1.2.0/24</network>
+          <gateway>10.1.2.254</gateway>
+          <description>User Workstations</description>
+        </segment>
+        
+        <segment name="servers" vlan="300">
+          <network>10.1.4.0/24</network>
+          <gateway>10.1.4.254</gateway>
+          <description>Server Network</description>
+        </segment>
+        
+        <segment name="wireless" vlan="400">
+          <network>10.1.5.0/24</network>
+          <gateway>10.1.5.254</gateway>
+          <description>Wireless Network</description>
+        </segment>
+      </network_segments>
+      
+      <devices>
+        <device id="rtr-hq-01" type="router">
+          <hostname>rtr-hq-01.fscj.edu</hostname>
+          <management_ip>10.1.1.1</management_ip>
+          <vendor>Cisco</vendor>
+          <model>ISR4451</model>
+          <location rack="R01" unit="1"/>
+          <status>online</status>
+          
+          <interfaces>
+            <interface name="GigabitEthernet0/0/0" type="wan">
+              <ip_address>203.0.113.10</ip_address>
+              <subnet_mask>255.255.255.252</subnet_mask>
+              <status>up</status>
+              <description>Internet Connection - Comcast</description>
+              <bandwidth>1000</bandwidth>
+            </interface>
+            
+            <interface name="GigabitEthernet0/0/1" type="lan">
+              <ip_address>10.1.1.254</ip_address>
+              <subnet_mask>255.255.255.0</subnet_mask>
+              <status>up</status>
+              <description>LAN Trunk to Core Switch</description>
+              <bandwidth>1000</bandwidth>
+            </interface>
+            
+            <interface name="Loopback0" type="loopback">
+              <ip_address>1.1.1.1</ip_address>
+              <subnet_mask>255.255.255.255</subnet_mask>
+              <status>up</status>
+              <description>Router ID</description>
+            </interface>
+          </interfaces>
+          
+          <routing>
+            <protocol name="OSPF">
+              <process_id>1</process_id>
+              <router_id>1.1.1.1</router_id>
+              <areas>
+                <area id="0.0.0.0">
+                  <networks>
+                    <network>10.1.1.0 0.0.0.255</network>
+                    <network>1.1.1.1 0.0.0.0</network>
+                  </networks>
+                </area>
+              </areas>
+            </protocol>
+            
+            <static_routes>
+              <route>
+                <destination>0.0.0.0</destination>
+                <netmask>0.0.0.0</netmask>
+                <next_hop>203.0.113.9</next_hop>
+                <description>Default Route to ISP</description>
+              </route>
+            </static_routes>
+          </routing>
+        </device>
+        
+        <device id="sw-hq-core" type="switch">
+          <hostname>sw-hq-01.fscj.edu</hostname>
+          <management_ip>10.1.1.10</management_ip>
+          <vendor>Cisco</vendor>
+          <model>Catalyst 3850</model>
+          <location rack="R02" unit="1"/>
+          <status>online</status>
+          
+          <interfaces>
+            <interface name="GigabitEthernet1/0/1" type="trunk">
+              <status>up</status>
+              <description>Uplink to Router</description>
+              <vlans>all</vlans>
+              <native_vlan>1</native_vlan>
+            </interface>
+            
+            <interface name="GigabitEthernet1/0/2" type="trunk">
+              <status>up</status>
+              <description>Link to Distribution Switch 1</description>
+              <vlans>100,200,300,400</vlans>
+              <native_vlan>1</native_vlan>
+            </interface>
+            
+            <interface name="GigabitEthernet1/0/3" type="trunk">
+              <status>up</status>
+              <description>Link to Distribution Switch 2</description>
+              <vlans>100,200,300,400</vlans>
+              <native_vlan>1</native_vlan>
+            </interface>
+            
+            <interface name="FastEthernet1/0/10" type="access">
+              <status>up</status>
+              <description>Server Connection</description>
+              <vlan>300</vlan>
+              <port_security enabled="true" max_mac="2"/>
+            </interface>
+          </interfaces>
+          
+          <vlans>
+            <vlan id="100" name="management">
+              <description>Management VLAN</description>
+              <ip_helper>10.1.1.254</ip_helper>
+            </vlan>
+            
+            <vlan id="200" name="users">
+              <description>User Workstations</description>
+              <ip_helper>10.1.1.254</ip_helper>
+            </vlan>
+            
+            <vlan id="300" name="servers">
+              <description>Server Network</description>
+              <ip_helper>10.1.1.254</ip_helper>
+            </vlan>
+            
+            <vlan id="400" name="wireless">
+              <description>Wireless Access Points</description>
+              <ip_helper>10.1.1.254</ip_helper>
+            </vlan>
+          </vlans>
+          
+          <spanning_tree>
+            <mode>rapid-pvst</mode>
+            <root_bridge priority="4096"/>
+          </spanning_tree>
+        </device>
+        
+        <device id="fw-hq-01" type="firewall">
+          <hostname>fw-hq-01.fscj.edu</hostname>
+          <management_ip>10.1.1.100</management_ip>
+          <vendor>Fortinet</vendor>
+          <model>FortiGate 100F</model>
+          <location rack="R04" unit="1"/>
+          <status>online</status>
+          
+          <zones>
+            <zone name="WAN" security_level="0">
+              <description>Internet/External</description>
+            </zone>
+            
+            <zone name="LAN" security_level="100">
+              <description>Internal Network</description>
+            </zone>
+            
+            <zone name="DMZ" security_level="50">
+              <description>Demilitarized Zone</description>
+            </zone>
+          </zones>
+          
+          <interfaces>
+            <interface name="port1" zone="WAN">
+              <ip_address>172.16.1.1</ip_address>
+              <subnet_mask>255.255.255.0</subnet_mask>
+              <status>up</status>
+              <description>DMZ Interface</description>
+            </interface>
+            
+            <interface name="port2" zone="LAN">
+              <ip_address>10.1.1.254</ip_address>
+              <subnet_mask>255.255.255.0</subnet_mask>
+              <status>up</status>
+              <description>Internal LAN Interface</description>
+            </interface>
+          </interfaces>
+          
+          <security_policies>
+            <policy id="1" name="LAN_to_WAN">
+              <source_zone>LAN</source_zone>
+              <destination_zone>WAN</destination_zone>
+              <action>permit</action>
+              <services>HTTP,HTTPS,FTP,SSH,TELNET,DNS,DHCP</services>
+              <logging>enabled</logging>
+            </policy>
+            
+            <policy id="2" name="WAN_to_DMZ">
+              <source_zone>WAN</source_zone>
+              <destination_zone>DMZ</destination_zone>
+              <action>permit</action>
+              <services>HTTP,HTTPS</services>
+              <logging>enabled</logging>
+            </policy>
+            
+            <policy id="3" name="DENY_ALL">
+              <source_zone>any</source_zone>
+              <destination_zone>any</destination_zone>
+              <action>deny</action>
+              <services>any</services>
+              <logging>enabled</logging>
+            </policy>
+          </security_policies>
+        </device>
+        
+        <device id="wlc-hq-01" type="wireless_controller">
+          <hostname>wlc-hq-01.fscj.edu</hostname>
+          <management_ip>10.1.1.50</management_ip>
+          <vendor>Cisco</vendor>
+          <model>WLC 3504</model>
+          <location rack="R08" unit="1"/>
+          <status>online</status>
+          
+          <wireless_settings>
+            <ssid name="FSCJ-Faculty" vlan="200" security="WPA2-Enterprise">
+              <authentication_server>10.1.4.20</authentication_server>
+              <encryption>AES</encryption>
+            </ssid>
+            
+            <ssid name="FSCJ-Student" vlan="201" security="WPA2-PSK">
+              <passphrase>StudentAccess2024!</passphrase>
+              <encryption>AES</encryption>
+            </ssid>
+            
+            <ssid name="FSCJ-Guest" vlan="202" security="Open">
+              <captive_portal>enabled</captive_portal>
+              <bandwidth_limit>10</bandwidth_limit>
+            </ssid>
+          </wireless_settings>
+          
+          <access_points>
+            <ap name="ap-hq-01" model="Cisco AIR-CAP3702I">
+              <location>Computer Lab A</location>
+              <ip_address>10.1.5.11</ip_address>
+              <status>online</status>
+              <clients_connected>24</clients_connected>
+            </ap>
+            
+            <ap name="ap-hq-02" model="Cisco AIR-CAP3702I">
+              <location>Computer Lab B</location>
+              <ip_address>10.1.5.12</ip_address>
+              <status>online</status>
+              <clients_connected>18</clients_connected>
+            </ap>
+            
+            <ap name="ap-hq-03" model="Cisco AIR-CAP3702I">
+              <location>Library</location>
+              <ip_address>10.1.5.13</ip_address>
+              <status>offline</status>
+              <clients_connected>0</clients_connected>
+            </ap>
+          </access_points>
+        </device>
+      </devices>
+    </site>
+    
+    <site id="ORLANDO" name="Orlando Branch" location="Orlando, FL">
+      <address>
+        <street>9911 Old Baymeadows Rd</street>
+        <city>Orlando</city>
+        <state>FL</state>
+        <zip>32256</zip>
+      </address>
+      
+      <network_segments>
+        <segment name="management" vlan="100">
+          <network>10.2.1.0/24</network>
+          <gateway>10.2.1.254</gateway>
+        </segment>
+        
+        <segment name="users" vlan="200">
+          <network>10.2.2.0/24</network>
+          <gateway>10.2.2.254</gateway>
+        </segment>
+      </network_segments>
+      
+      <devices>
+        <device id="rtr-orl-01" type="router">
+          <hostname>rtr-orl-01.fscj.edu</hostname>
+          <management_ip>10.2.1.1</management_ip>
+          <vendor>Cisco</vendor>
+          <model>ISR4321</model>
+          <status>online</status>
+          
+          <wan_connection>
+            <type>MPLS</type>
+            <provider>AT&T</provider>
+            <bandwidth>100</bandwidth>
+            <ip_address>172.20.1.2</ip_address>
+            <remote_ip>172.20.1.1</remote_ip>
+          </wan_connection>
+        </device>
+        
+        <device id="sw-orl-01" type="switch">
+          <hostname>sw-orl-01.fscj.edu</hostname>
+          <management_ip>10.2.1.10</management_ip>
+          <vendor>Cisco</vendor>
+          <model>Catalyst 2960L</model>
+          <status>online</status>
+        </device>
+      </devices>
+    </site>
+  </sites>
+  
+  <connections>
+    <connection type="ethernet">
+      <endpoint1 device="rtr-hq-01" interface="GigabitEthernet0/0/1"/>
+      <endpoint2 device="sw-hq-core" interface="GigabitEthernet1/0/1"/>
+      <speed>1000</speed>
+      <description>Core Router to Core Switch</description>
+    </connection>
+    
+    <connection type="wan">
+      <endpoint1 device="rtr-hq-01" interface="GigabitEthernet0/0/0"/>
+      <endpoint2 device="ISP" interface="Customer_Port"/>
+      <speed>1000</speed>
+      <description>Internet Connection</description>
+    </connection>
+    
+    <connection type="mpls">
+      <endpoint1 device="rtr-hq-01"/>
+      <endpoint2 device="rtr-orl-01"/>
+      <speed>100</speed>
+      <description>MPLS Connection HQ to Orlando</description>
+    </connection>
+  </connections>
+  
+  <services>
+    <service name="DHCP">
+      <server>10.1.1.1</server>
+      <scopes>
+        <scope network="10.1.2.0/24" range="10.1.2.100-10.1.2.200"/>
+        <scope network="10.1.5.0/24" range="10.1.5.100-10.1.5.200"/>
+      </scopes>
+    </service>
+    
+    <service name="DNS">
+      <primary_server>10.1.4.10</primary_server>
+      <secondary_server>10.1.4.11</secondary_server>
+      <forwarders>8.8.8.8,1.1.1.1</forwarders>
+    </service>
+    
+    <service name="NTP">
+      <servers>pool.ntp.org,time.nist.gov</servers>
+      <timezone>EST</timezone>
+    </service>
+  </services>
+</network_topology>

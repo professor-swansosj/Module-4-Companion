@@ -1,0 +1,38 @@
+{
+  "device_info": {
+    "hostname": "router-lab-01",
+    "model": "ISR4431",
+    "version": "16.09.04",
+    "uptime": "15 days, 4 hours, 22 minutes",
+    "memory_usage": 45,
+    "cpu_usage": 12
+  },
+  "interfaces": [
+    {
+      "name": "GigabitEthernet0/0/0",
+      "status": "up",
+      "ip_address": "192.168.1.1",
+      "subnet_mask": "255.255.255.0"
+    },
+    {
+      "name": "GigabitEthernet0/0/1", 
+      "status": "down",
+      "ip_address": null,
+      "subnet_mask": null
+    }
+  ],
+  "routing_table": [
+    {
+      "network": "0.0.0.0/0",
+      "next_hop": "192.168.1.254",
+      "interface": "GigabitEthernet0/0/0"
+    },
+    {
+      "network": "192.168.1.0/24",
+      "next_hop": "directly connected",
+      "interface": "GigabitEthernet0/0/0"
+    }
+  ],
+  "status": "healthy",
+  "last_updated": "2025-10-27T10:30:00Z"
+}

@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "deck_id": "3p40paa87x90", 
+  "cards": [
+    {
+      "code": "KH",
+      "image": "https://deckofcardsapi.com/static/img/KH.png",
+      "images": {
+        "svg": "https://deckofcardsapi.com/static/img/KH.svg",
+        "png": "https://deckofcardsapi.com/static/img/KH.png"
+      },
+      "value": "KING",
+      "suit": "HEARTS"
+    },
+    {
+      "code": "8C",
+      "image": "https://deckofcardsapi.com/static/img/8C.png", 
+      "images": {
+        "svg": "https://deckofcardsapi.com/static/img/8C.svg",
+        "png": "https://deckofcardsapi.com/static/img/8C.png"
+      },
+      "value": "8",
+      "suit": "CLUBS"
+    }
+  ],
+  "remaining": 50
+}

@@ -1,0 +1,20 @@
+# Python Requests Library - Module 4 Companion Lab Requirements
+# 
+# This companion lab focuses on learning the Python Requests library
+# for API automation in network engineering contexts.
+
+# Core requirement - Python Requests library for HTTP/API calls
+requests>=2.25.1
+
+# JSON handling is built into Python, but including for clarity
+# json - Built into Python standard library
+
+# For pretty printing and development (optional but helpful)
+# These are commonly used alongside requests in network automation
+urllib3>=1.26.0
+
+# Note: All other modules used (json, base64) are part of Python standard library
+# No additional installations needed beyond requests and urllib3
+
+# For students using older Python versions, ensure compatibility:
+# Python 3.7+ recommended for this lab
